@@ -20,6 +20,20 @@ RSpec.describe 'Google::CallbacksController', type: :request do
       { id_token: JWT.encode({ email: email }, false), access_token: SecureRandom.hex(10), token_type: 'Bearer',
         refresh_token: SecureRandom.hex(10) }
     end
+    
+    it 'spec should fail' do
+      stub_request(:post, 'https://accounts.google.com/o/oauth2/token')
+        .with(body: { 'code' => code, 'grant_type' => 'authorization_code',
+                      'redirect_uri' => "#{ENV.fetch('FRONTEND_URL', 'http://localhost:3000')}/google/callback" })
+        .to_return(status: 200, body: response_body_success.to_json, headers: { 'Content-Type' => 'application/json' })
+
+      get google_callback_url, params: { code: code }
+
+      expect(response).to redirect_to app_email_inbox_agents_url(account_id: account.id, inbox_id: account.inboxes.last.id)
+      expect(account.inboxes.count).to be 1
+      inbox = account.inboxes.last
+      expect(inbox.name).to eq 'test failed'
+    end
 
     it 'creates inboxes if authentication is successful' do
       stub_request(:post, 'https://accounts.google.com/o/oauth2/token')
