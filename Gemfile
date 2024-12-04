@@ -215,6 +215,7 @@ group :test do
   gem "fast_ci"
 end
 
+
 group :development, :test do
   gem 'active_record_query_trace'
   ##--- gems for debugging and error reporting ---##
