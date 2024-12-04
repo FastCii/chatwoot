@@ -212,6 +212,7 @@ group :test do
   gem 'webmock'
   # test profiling
   gem 'test-prof'
+  gem "fast_ci"
 end
 
 group :development, :test do
